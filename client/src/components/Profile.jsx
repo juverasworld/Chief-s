@@ -3,18 +3,21 @@ import { Toaster } from "react-hot-toast";
 import { useFormik } from "formik";
 import "../App.css"
 import message from "../images/message.jpg"
-import { registerValidation } from "../helper/validate";
+import { profileValidation } from "../helper/validate";
 import { useState } from "react";
 import convertToBase64 from "../helper/convert";
+import extend from "../styles/Profile.module.css";
 const Profile = () => {
     const [file, setFile] = useState()
     const formik = useFormik({
         initialValues: {
+            firstName: "",
+            lastName: "",
             email: "",
-            username: "",
-            password: ""
+            mobile: "",
+        address: ""
         },
-        validate: registerValidation,
+        validate: profileValidation,
         validateOnBlur: false,
         validateOnChange: false,
         onSubmit: async values => {
@@ -58,15 +61,14 @@ const Profile = () => {
                             </div>
 
                             <div className="name flex w-3/4 gap-10">
-                                <input {...formik.getFieldProps("address")} type="text" placeholder="firstName" />
-                                <input {...formik.getFieldProps("lastName")} type="text" placeholder="lastName" />
+                                <input {...formik.getFieldProps("address")} type="text" placeholder="Address" />
+                                
                             </div>
-                            <input {...formik.getFieldProps("username")} type="text" placeholder="username" />
-                            <input {...formik.getFieldProps("password")} type="password" placeholder="Password" />
-                            <button type="submit"> Register</button>
+                           
+                            <button type="submit"> Update</button>
                         </div>
                         <div className="text-center py-4">
-                            <span> Already a  member? <Link className="text-red-500" to="/"> Login now</Link></span>
+                            <span> Come back later <Link className="text-red-500" to="/"> Login Out</Link></span>
                         </div>
                     </form>
                 </div>

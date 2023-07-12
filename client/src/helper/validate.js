@@ -28,6 +28,13 @@ emailVerify(errors, values);
 
 return errors
 }
+// {validate profile page}
+export async function profileValidation(values){
+    const errors= emailVerify({}, values);
+    return errors;
+}
+
+// ............................................
 
 // validate password;
 function passwordVerify( errors ={}, values){

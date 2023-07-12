@@ -4,10 +4,11 @@ import {Router} from "express";
 const router = Router()
 import * as controller from "../controller/appController.js"
 // POST
-router.route(controller.register).post((req, res)=> res.json('register route')),
+// router.route(controller.register).post((req, res)=> res.json('register route')),
 router.route("/registerMail").post() //send the mail
 router.route("/authenticate").post((req, res)=> res.end( ))
-router.route("/login ").post(controller.login)
+router.route("/login").post(controller.login)
+router.route("/register").post(controller.register)
 
 // Get Method
 router.route("/user/:username").get(controller.getUser)

@@ -1,7 +1,23 @@
 import User from "../model/User.model.js";
-// import {Jwt} from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt";
 // import ENV from "../config.js"
+import ENV from "../config.js"
+import UserModel from "../model/User.model.js";
+
+
+// creating a middleware for user
+export async function verifyUser(req, res, next) {
+    try {
+        const { username } = req.method == "GET" ? req.query : req.body;
+        // checking the user existance
+        let exist = await UserModel.findOne({ username });
+        if (!exist) return res.status(404).send({ error: "Can't find user" })
+        next()
+    } catch (error) {
+        return res.status(404).send({ error: "Authentication Error" })
+    }
+}
 /** POST : https://localhost:8080/api/register
  * @param : {
  "username": "example123",
@@ -19,7 +35,7 @@ export async function register(req, res) {
     try {
         const { username, password, email, profile } = req.body;
         // to check for the existing user
-        const existUsername = User.findOne({username});
+        const existUsername = User.findOne({ username });
         // console.log(existUsername);
 
 
@@ -45,8 +61,8 @@ export async function register(req, res) {
                         })
                         // return save  result as a response
                         user.save()
-                        .then(result =>res.status(201).send({msg : "User Register  Successful " }))
-                        .catch(error =>res.status(500).send(error))
+                            .then(result => res.status(201).send({ msg: "User Register  Successful " }))
+                            .catch(error => res.status(500).send(error))
                     }).catch(error => {
                         return res.status(500).send({
                             error: "Enable to hash password "
@@ -72,45 +88,70 @@ export async function register(req, res) {
  */
 
 export async function login(req, res) {
-   const { username, password} =req.body;
+    const { username, password } = req.body;
 
-   try {
-    User.findOne({ username })
-        .then( user =>{
-            bcrypt.compare(password, user.password )
-            .then( passwordCheck =>{
-                if(!passwordCheck) return res.status(400).send({error: "Don't have Password"})
+    try {
+        User.findOne({ username })
+            .then(user => {
+                bcrypt.compare(password, user.password)
+                    .then(passwordCheck => {
+                        if (!passwordCheck) return res.status(400).send({ error: "Don't have Password" })
 
-                // create jwt token
-               const token =  jwt.sign({
-                    userId: user._id,
-                    username : user.username
-                 }, "secret", {expiresIn: "24h"});
-                 return res.status(200).send({
-                    msg: "Login Successful ..... !",
-                    username: user.username,
-                    token
-                 })
-            } )
-            .catch(error=>{
-                return res.status(400).send({error:"Password does not match"})
+                        // create jwt token
+                        const token = jwt.sign({
+                            userId: user._id,
+                            username: user.username
+                        }, "ENV.JWT_SECRET", { expiresIn: "24h" });
+                        return res.status(200).send({
+                            msg: "Login Successful ..... !",
+                            username: user.username,
+                            token
+                        })
+                    })
+                    .catch(error => {
+                        return res.status(400).send({ error: "Password does not match" })
+                    })
+
+            })
+            .catch(error => {
+                return res.status(404).send({ error: "Username not found" })
             })
 
-        })
-        .catch( error =>{
-            return res.status(404).send({error: "Username not found"})
-        })
-   
-   } catch (error) {
-    return res.status(500).send({error})
-   }
+    } catch (error) {
+        return res.status(500).send({ error })
+    }
 }
 
 export async function getUser(req, res) {
-    res.json("getUser route")
-} 
+    const { username } = req.params;
+    try {
+        if (!username) return res.status(501).send({ error: "Invalid Username" });
+        UserModel.findOne({ username }, function (err, user) {
+            if (err) return res.status(500).send({ err });
+            if (!User) return res.status(501).send({ error: "Could'nt find the user" });
+// removing password from user
+            const { password, ...rest } = Object.assign({}, user.toJSON())
+            return res.status(201).send(user)
+        })
+    } catch (error) {
+        return res.status(404).send({ error: "cannot find user data" })
+    }
+}
 export async function updateUser(req, res) {
-    res.json("updateUser route")
+    try {
+        const id= req.query.id;
+if(id){
+const body = req.body;
+// Updating data
+UserModel.updateOne({_id:id}, body, function(err,data){
+    if(err) throw err;
+
+    return res.status(201).send({msg:"Record Updated...!"})
+}) 
+}else{return res.status(401).send({error:"User Not Found ...!"})}
+    } catch (error) {
+    return res.status(401).send({error})    
+    }
 }
 
 export async function generateOTP(req, res) {

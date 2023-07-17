@@ -36,6 +36,10 @@ const router = createBrowserRouter([
     element : <Reset></Reset>
   },
   {
+    path : "/username",
+    element : <Username></Username>
+  },
+  {
     path : "*",
     element : <PageNotFound></PageNotFound>
   }

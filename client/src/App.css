@@ -11,9 +11,9 @@
 input[type="file"]{
   display: none;
 }
-input {
+/* input {
   border-bottom: black 1px solid;
-}
+} */
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
